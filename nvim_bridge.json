@@ -1,0 +1,9 @@
+{
+  "name": "nvim_bridge",
+  "description": "Bridge from boot.dev to Neovim",
+  "path": "",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://__YOUR_EXTENSION_ID__/"
+  ]
+}

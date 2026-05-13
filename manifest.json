@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "nvim-bridge",
+  "version": "0.1",
+  "icons": {
+    "32": "images/icon-inactive.png"
+  },
+  "description": "Send selected text to Neovim",
+  "permissions": ["activeTab", "tabs", "nativeMessaging"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": 
+  [
+    {
+      "matches": ["*://www.boot.dev/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "action": {
+    "default_title": "Send to Neovim"
+  }
+}
