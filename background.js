@@ -4,13 +4,28 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 });
 
+const api_url = 'https://api.boot.dev/v1/static/';
 chrome.action.onClicked.addListener(async (tab) => {
-  const response = await chrome.tabs.sendMessage(tab.id, { action: "getSelection" });
+  let parts = tab.url.split('dev');
+  let lesson_url = api_url + parts[1];
+  let buffers = {};
+  try {
+    const response = await fetch(lesson_url);
+    if (!response.ok) {
+      throw new Error(`Response status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    for(const file of result.Lesson.LessonDataCodeTests.StarterFiles){
+      buffers[file.Name] = file.Content;
+    }
+  } catch (error) {
+    console.error(error.message);
+  }
   
-  if (response) {
+  if (Object.keys(buffers).length > 0) {
     try {
-      const result = await chrome.runtime.sendNativeMessage("nvim_bridge", response);
-      console.log("Sent to Neovim:", result);
+      const result = await chrome.runtime.sendNativeMessage("nvim_bridge", buffers);
     } catch (err) {
       console.error("Native messaging error:", err);
     }

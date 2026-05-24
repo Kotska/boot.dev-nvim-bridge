@@ -19,5 +19,6 @@
   ],
   "action": {
     "default_title": "Send to Neovim"
-  }
+  },
+  "host_permissions": ["https://api.boot.dev/*"]
 }
