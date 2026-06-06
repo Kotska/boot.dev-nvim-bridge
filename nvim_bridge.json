@@ -1,9 +1,9 @@
 {
   "name": "nvim_bridge",
   "description": "Bridge from boot.dev to Neovim",
-  "path": "",
+  "path": "C:\\Users\\Dani\\Projects\\boot.dev-nvim-bridge\\nvim-bridge.cmd",
   "type": "stdio",
   "allowed_origins": [
-    "chrome-extension://__YOUR_EXTENSION_ID__/"
+    "chrome-extension://bpolcbeceigaemkcnghibdbojcooiinl/"
   ]
 }

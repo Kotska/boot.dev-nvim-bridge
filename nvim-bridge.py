@@ -5,25 +5,41 @@ import sys
 import os
 import subprocess
 from pynvim import attach
+from pynvim.api.common import NvimError
+
+if os.name == 'nt':
+    import msvcrt
+    msvcrt.setmode(sys.stdin.fileno(), os.O_BINARY)
+    msvcrt.setmode(sys.stdout.fileno(), os.O_BINARY)
 
 def send_to_nvim(data):
-    run_path = "/run/user/1000/"
+    if "posix" in os.name:
+        run_path = "/run/user/1000/"
+    else:
+        run_path = "//./pipe/"
+
     sockets = []
     for filename in os.listdir(run_path):
         if "nvim" in filename:
             sockets.append(os.path.join(run_path, filename))
 
+    success = False
     for target_buffer, text in data.items():
         for socket in sockets:
             nvim = attach('socket', path=socket)
 
             for buf in nvim.buffers:
-                if target_buffer in buf.name:
-                    nvim.current.buffer = buf
-                    buf[:] = text.split('\n')
-                    nvim.command('write')
+                try:
+                    if target_buffer in buf.name:
+                        nvim.current.buffer = buf
+                        buf[:] = text.split('\n')
+                        nvim.command('write')
+                        success = True
+                        break
+                except NvimError:
+                    continue
 
-    return {"success": True}
+    return {"success": success}
 
 def read_message():
     raw = sys.stdin.buffer.read(4)

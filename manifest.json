@@ -6,19 +6,29 @@
     "32": "images/icon-inactive.png"
   },
   "description": "Send selected text to Neovim",
-  "permissions": ["activeTab", "tabs", "nativeMessaging"],
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "nativeMessaging"
+  ],
   "background": {
     "service_worker": "background.js"
   },
-  "content_scripts": 
-  [
+  "content_scripts": [
     {
-      "matches": ["*://www.boot.dev/*"],
-      "js": ["content.js"]
+      "matches": [
+        "*://www.boot.dev/*"
+      ],
+      "js": [
+        "content.js"
+      ]
     }
   ],
   "action": {
     "default_title": "Send to Neovim"
   },
-  "host_permissions": ["https://api.boot.dev/*"]
+  "host_permissions": [
+    "https://api.boot.dev/*"
+  ],
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAn4HoL/9TwY2IbXycOLX0X5IrrsapwwZWK5thC2oejnA3Nn9CDBhooxCsXPM7lbT7TbQ3WMZHz/5Rk09QIKpVEcNy+h9mCciNUo8IHy0mVqRplo4BA7+q1RfauH/W5acxO5COUZKCvGgAP5pBF2aoDelUhMNNfTlkRLLqWYyNMr1L9cGwfWw+YSSGtuMLaes9C3KO1Gts2sv73NEleUm08g4TOEydNiNBQF+wsmnT7h4qAuGVtASoCWM77w4Z6+CQraBawY1SWWFEdEg4v5yQgIMipK3LAs1vnPjHdkbENl99fdyM0UsJGs6EKRwZ47gh49LOVGR8cyVZQXWzoNqPXQIDAQAB"
 }

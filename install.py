@@ -8,9 +8,11 @@ import re
 import subprocess
 import sys
 
+sys.dont_write_bytecode = True
+
 HOST_NAME = "nvim_bridge"
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-HOST_PATH = os.path.join(SCRIPT_DIR, "nvim-bridge")
+HOST_PATH = os.path.join(SCRIPT_DIR, "nvim-bridge.cmd" if platform.system() == "Windows" else "nvim-bridge.py")
 MANIFEST_PATH = os.path.join(SCRIPT_DIR, "manifest.json")
 KEY_FILE = os.path.join(SCRIPT_DIR, "private_key.pem")
 ID_ALPHABET = "abcdefghijklmnop"
@@ -65,7 +67,7 @@ def ensure_key():
         "openssl", "genpkey", "-algorithm", "RSA",
         "-out", KEY_FILE,
         "-pkeyopt", "rsa_keygen_bits:2048",
-    ], check=True)
+    ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     with open(KEY_FILE) as f:
         return f.read()
@@ -101,6 +103,20 @@ def update_manifest(pub_key_b64):
         f.write("\n")
 
 
+def _install_registry(manifest_path):
+    if platform.system() != "Windows":
+        return
+    import winreg
+    key_path = r"SOFTWARE\Google\Chrome\NativeMessagingHosts\nvim_bridge"
+    try:
+        key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, key_path)
+        winreg.SetValueEx(key, None, 0, winreg.REG_SZ, manifest_path)
+        winreg.CloseKey(key)
+        print(f"Registry: HKCU\\{key_path} -> {manifest_path}")
+    except PermissionError:
+        print("Warning: Could not write to registry (permission denied)")
+
+
 def install():
     ensure_key()
     pub_key_b64 = get_pub_key_b64()
@@ -126,6 +142,12 @@ def install():
         with open(dest, "w") as f:
             json.dump(manifest_host, f, indent=2)
         print(f"Installed: {dest}")
+
+    if platform.system() == "Windows":
+        manifest_file = os.path.join(SCRIPT_DIR, f"{HOST_NAME}.json")
+        with open(manifest_file, "w") as f:
+            json.dump(manifest_host, f, indent=2)
+        _install_registry(manifest_file)
 
     print(f"\nExtension ID: {ext_id}")
     print("Now load the extension in chrome://extensions (reload if already loaded).")
